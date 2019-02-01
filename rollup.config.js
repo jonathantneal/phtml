@@ -5,7 +5,7 @@ export default {
 	input: 'src/index.mjs',
 	output: [
 		{ file: 'index.js', format: 'cjs' },
-		{ file: 'index.mjs', format: 'es' },
+		{ file: 'index.mjs', format: 'esm' },
 		{ file: 'browser.js', format: 'iife', name: 'posthtml' }
 	],
 	plugins: [
