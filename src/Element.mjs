@@ -34,21 +34,22 @@ class Element extends Container {
 			name: String('name' in Object(settings) ? settings.name : 'span'),
 			isSelfClosing: Boolean(Object(settings).isSelfClosing),
 			isVoid: Boolean(Object(settings).isVoid),
+			isWithoutEndTag: Boolean(Object(settings).isWithoutEndTag),
 			attrs: AttributeList.from(Object(settings).attrs),
 			nodes: null,
 			source: Object(Object(settings).source)
 		});
 
 		// Nodes appended to the Element
-		if (!this.selfClosing && !this.isVoid) {
-			this.nodes = Object(settings).nodes instanceof NodeList
+		this.nodes = Object(settings).nodes === Object(Object(settings).nodes)
+			? Object(settings).nodes instanceof NodeList
 				? new NodeList(this, ...settings.nodes.splice(0, settings.nodes.length))
 			: Object(settings).nodes instanceof Array
 				? new NodeList(this, ...settings.nodes)
 			: Object(settings).nodes instanceof Node
 				? new NodeList(this, settings.nodes)
-			: new NodeList(this);
-		}
+			: new NodeList(this)
+		: new NodeList(this);
 	}
 
 	/**
@@ -80,9 +81,9 @@ class Element extends Container {
 	* @returns {String}
 	*/
 	get sourceInnerHTML () {
-		return this.isSelfClosing || this.isVoid || typeof this.source.input !== 'string'
+		return this.isSelfClosing || this.isVoid || typeof Object(this.source.input).html !== 'string'
 			? ''
-		: this.source.input.slice(
+		: this.source.input.html.slice(
 			this.source.startInnerOffset,
 			this.source.endInnerOffset
 		);
@@ -93,9 +94,9 @@ class Element extends Container {
 	* @returns {String}
 	*/
 	get sourceOuterHTML () {
-		return typeof this.source.input !== 'string'
+		return typeof Object(this.source.input).html !== 'string'
 			? ''
-		: this.source.input.slice(
+		: this.source.input.html.slice(
 			this.source.startOffset,
 			this.source.endOffset
 		);
@@ -106,11 +107,11 @@ class Element extends Container {
 	* @returns {String}
 	*/
 	toString () {
-		const start = `${this.name}${this.attrs.length ? ` ${this.attrs}` : ''}`;
-
-		return this.isSelfClosing || this.isVoid
-			? `<${start}${this.isVoid ? '' : '/'}>`
-		: `<${start}>${this.nodes}</${this.name}>`;
+		return `<${this.name}${this.attrs}${this.source.before || ''}>${this.nodes || ''}${
+			this.isSelfClosing || this.isVoid || this.isWithoutEndTag
+				? ''
+			: `</${this.name}${this.source.after || ''}>`
+		}`;
 	}
 
 	/**

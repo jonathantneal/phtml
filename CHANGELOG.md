@@ -1,5 +1,18 @@
 # Changes to pHTML
 
+### 2.0.0 (February 17, 2019)
+
+- Added: Browser version
+- Added: CLI version
+- Added: Plugins now allow observers
+- Added: `Fragment` can now take nodes
+- Added: `#Result.messages` to contain warnings and other types of messages
+- Changed: Parser is now smaller, synchronous, and can be run in the browser
+- Changed: `Result` returns the `root` fragment syncronously
+- Changed: Raw HTML spacing is added and used to stringify tags and attributes
+- Changed: Tag case-sensitivity is preserved
+- Changed: `source.input` is now an Object containing `html`, `from,` and `to`
+
 ### 1.2.0 (February 13, 2019)
 
 - Added: `NodeList.from()` creates a NodeList from an array or Nodes and Strings

@@ -33,7 +33,8 @@ class AttributeList extends Array {
 		const isObject = nameOrAttrs === Object(nameOrAttrs);
 		const attrs = isObject ? getAttributeListArray(nameOrAttrs) : [{
 			name: String(nameOrAttrs),
-			value: normalizeAttrValue(args[0])
+			value: normalizeAttrValue(args[0]),
+			source: {}
 		}];
 
 		return this.toggle(attrs, true);
@@ -122,7 +123,8 @@ class AttributeList extends Array {
 		const isObject = nameOrAttrs === Object(nameOrAttrs);
 		const attrs = isObject ? getAttributeListArray(nameOrAttrs) : [{
 			name: String(nameOrAttrs),
-			value: normalizeAttrValue(args[0])
+			value: normalizeAttrValue(args[0]),
+			source: {}
 		}];
 
 		return !this.toggle(attrs, false);
@@ -147,7 +149,8 @@ class AttributeList extends Array {
 		const isObject = nameOrAttrs === Object(nameOrAttrs);
 		const attrs = isObject ? getAttributeListArray(nameOrAttrs) : [{
 			name: String(nameOrAttrs),
-			value: normalizeAttrValue(args[0])
+			value: normalizeAttrValue(args[0]),
+			source: {}
 		}];
 		const force = isObject ? args[0] : args[1];
 		const isNoForceDefined = force === undefined;
@@ -184,8 +187,8 @@ class AttributeList extends Array {
 	toString () {
 		return this.length
 			? `${this.map(
-				attr => `${attr.name}${attr.value === null ? '' : `="${attr.value}"`}`
-			).join(' ')}`
+				attr => `${Object(attr.source).before || ' '}${attr.name}${attr.value === null ? '' : `=${Object(attr.source).quote || '"'}${attr.value}${Object(attr.source).quote || '"'}`}`
+			).join('')}`
 		: ''
 	}
 
@@ -243,11 +246,13 @@ function getAttributeListArray (attrs) {
 	return Array.isArray(attrs)
 		? Array.from(attrs).filter(attr => attr).map(attr => ({
 			name: String(Object(attr).name),
-			value: normalizeAttrValue(Object(attr).value)
+			value: normalizeAttrValue(Object(attr).value),
+			source: Object(Object(attr).source)
 		}))
 	: Object.keys(Object(attrs)).map(name => ({
 		name: getKebabCaseString(name),
-		value: normalizeAttrValue(attrs[name])
+		value: normalizeAttrValue(attrs[name]),
+		source: {}
 	}));
 }
 

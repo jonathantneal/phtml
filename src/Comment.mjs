@@ -51,9 +51,9 @@ class Comment extends Node {
 	* attrs.sourceInnerHTML // returns ' Hello World '
 	*/
 	get sourceInnerHTML () {
-		return typeof this.source.input !== 'string'
+		return typeof Object(this.source.input).html !== 'string'
 			? ''
-		: this.source.input.slice(
+		: this.source.input.html.slice(
 			this.source.startOffset + 4,
 			this.source.endOffset - 3
 		);
@@ -66,9 +66,9 @@ class Comment extends Node {
 	* attrs.sourceOuterHTML // returns '<!-- Hello World -->'
 	*/
 	get sourceOuterHTML () {
-		return typeof this.source.input !== 'string'
+		return typeof Object(this.source.input).html !== 'string'
 			? ''
-		: this.source.input.slice(
+		: this.source.input.html.slice(
 			this.source.startOffset,
 			this.source.endOffset
 		);

@@ -9,14 +9,26 @@ import NodeList from './NodeList';
 * @return {Fragment}
 */
 class Fragment extends Container {
-	constructor () {
+	constructor (settings) {
 		super();
 
 		Object.assign(this, {
 			type: 'fragment',
 			name: '#document-fragment',
-			nodes: new NodeList(this)
+			nodes: new NodeList(this),
+			source: Object(Object(settings).source)
 		});
+
+		// Nodes appended to the Element
+		if (Object(settings).nodes === Object(Object(settings).nodes)) {
+			this.nodes = settings.nodes instanceof NodeList
+				? new NodeList(this, ...settings.nodes.splice(0, settings.nodes.length))
+			: settings.nodes instanceof Array
+				? new NodeList(this, ...settings.nodes)
+			: settings.nodes instanceof Node
+				? new NodeList(this, settings.nodes)
+			: new NodeList(this);
+		}
 	}
 
 	/**

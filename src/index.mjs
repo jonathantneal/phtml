@@ -9,6 +9,7 @@ import NodeList from './NodeList';
 import Plugin from './Plugin';
 import Result from './Result';
 import Text from './Text';
+import observe, { runAll } from './observe';
 
 /**
 * @name PHTML
@@ -38,26 +39,40 @@ class PHTML {
 	*/
 	async process (input, processOptions) {
 		const result = new Result(input, processOptions);
+		const plugins = [];
+		const observers = {};
 
-		result.root = await result.root;
+		// initialize plugins and observer plugins
+		this.plugins.forEach(plugin => {
+			const intializedPlugin = plugin.type === 'plugin' ? plugin() : plugin;
 
-		if (this.plugins instanceof Array) {
-			for (const plugin of this.plugins) {
-				// update the current plugin
-				result.currentPlugin = plugin;
+			if (intializedPlugin instanceof Function) {
+				plugins.push(intializedPlugin);
+			} else if (Object(intializedPlugin) === intializedPlugin && Object.keys(intializedPlugin).length) {
+				Object.keys(intializedPlugin).forEach(key => {
+					const fn = intializedPlugin[key];
 
-				if (plugin instanceof Function) {
-					if (plugin.type === 'plugin') {
-						await plugin()(result.root, result);
-					} else {
-						await plugin(result.root, result);
+					if (fn instanceof Function) {
+						if (!observers[key]) {
+							observers[key] = [];
+						}
+
+						observers[key].push(intializedPlugin[key]);
 					}
-				}
-
-				// clear the current plugin
-				result.currentPlugin = null;
+				});
 			}
-		}
+		});
+
+		Object.assign(Node.prototype, {
+			async observe() {
+				return observe(this, result, observers);
+			}
+		});
+
+		// dispatch observers
+		await observe(result.root, result, observers);
+
+		await runAll(plugins, result.root, result);
 
 		return result;
 	}
@@ -74,9 +89,9 @@ class PHTML {
 	use (pluginOrPlugins) {
 		const plugins = pluginOrPlugins instanceof Array
 			? pluginOrPlugins.filter(
-				plugin => plugin instanceof Plugin || plugin instanceof Function
+				plugin => plugin instanceof Plugin || plugin instanceof Function || Object(plugin) === plugin && Object.keys(plugin).length
 			)
-		: pluginOrPlugins instanceof Plugin || pluginOrPlugins instanceof Function
+		: pluginOrPlugins instanceof Plugin || pluginOrPlugins instanceof Function || Object(pluginOrPlugins) === pluginOrPlugins && Object.keys(pluginOrPlugins).length
 			? [pluginOrPlugins]
 		: [];
 

@@ -20,10 +20,16 @@ class Doctype extends Node {
 
 		Object.assign(this, {
 			type: 'doctype',
+			doctype: String(Object(settings).doctype || 'doctype'),
 			name: String(Object(settings).name || 'html'),
 			publicId: Object(settings).publicId || null,
 			systemId: Object(settings).systemId || null,
-			source: Object(Object(settings).source)
+			source: Object.assign({
+				before: Object(Object(settings).source).before || ' ',
+				after: Object(Object(settings).source).after || '',
+				beforePublicId: Object(Object(settings).source).beforePublicId || null,
+				beforeSystemId: Object(Object(settings).source).beforeSystemId || null
+			}, Object(settings).source)
 		});
 	}
 
@@ -32,12 +38,10 @@ class Doctype extends Node {
 	* @returns {String}
 	*/
 	toString () {
-		const publicId = this.publicId ? ` PUBLIC "${this.publicId}"` : '';
-		const systemId = this.systemId ? ` "${this.systemId}"` : ''
-		const name = publicId || systemId ? `${this.name}`.toUpperCase() : String(this.name);
-		const doctype = publicId || systemId ? `DOCTYPE` : 'doctype';
+		const publicId = this.publicId ? `${this.source.beforePublicId || ' '}${this.publicId}` : '';
+		const systemId = this.systemId ? `${this.source.beforeSystemId || ' '}${this.systemId}` : '';
 
-		return `<!${doctype} ${name}${publicId}${systemId}>`;
+		return `<!${this.doctype}${this.source.before}${this.name}${this.source.after}${publicId}${systemId}>`;
 	}
 
 	/**

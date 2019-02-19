@@ -90,9 +90,23 @@ pHTML.use(
 #### Plugin Creation
 
 ```js
-import pHTML from 'phtml';
+import { Plugin } from 'phtml';
 
-export default new pHTML.Plugin('phtml-plugin-name', pluginOptions => {
+export default new Plugin('phtml-plugin-name', pluginOptions => {
+  // initialization logic
+
+  return {
+    Element(node, root) {
+      // runtime logic
+    }
+  };
+});
+```
+
+```js
+import { Plugin } from 'phtml';
+
+export default new Plugin('phtml-plugin-name', pluginOptions => {
   // initialization logic
 
   return (root, result) => {

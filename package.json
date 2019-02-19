@@ -1,6 +1,6 @@
 {
   "name": "phtml",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "A tool for transforming HTML with JavaScript",
   "author": "Jonathan Neal <jonathantneal@hotmail.com>",
   "license": "CC0-1.0",
@@ -9,17 +9,27 @@
   "bugs": "https://github.com/phtmlorg/phtml/issues",
   "main": "index.js",
   "module": "index.mjs",
+  "bin": {
+    "phtml": "cli.js"
+  },
   "files": [
     "index.js",
+    "index.js.map",
     "index.mjs",
+    "index.mjs.map",
     "browser.js"
   ],
   "scripts": {
     "prebenchmark": "npm install posthtml reshape --no-save",
     "benchmark": "node --experimental-modules=true .benchmark.mjs",
-    "build": "rollup -c --silent",
+    "build": "npm run build:browser && npm run build:cli && npm run build:node",
+    "build:browser": "npm run build:browser:min && npm run build:browser:dev",
+    "build:browser:dev": "cross-env NODE_ENV=browserdev rollup --config --silent",
+    "build:browser:min": "cross-env NODE_ENV=browsermin rollup --config --silent",
+    "build:cli": "cross-env NODE_ENV=cli rollup --config --silent",
+    "build:node": "rollup --config --silent",
     "docs": "jsdoc -c .jsdocrc -d .gh-pages",
-    "prepublishOnly": "npm test",
+    "prepublishOnly": "npm test && npm run build",
     "pretest": "npm run build",
     "test": "npm run test:js && npm run test:tape",
     "test:ec": "echint --ignore index.*.js test",
@@ -30,23 +40,27 @@
     "node": ">=6.0.0"
   },
   "dependencies": {
-    "parse5-sax-parser": "^5.1.0"
+    "parse5": "^5.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.2.2",
-    "@babel/plugin-proposal-class-properties": "^7.3.0",
+    "@babel/core": "^7.3.3",
+    "@babel/plugin-proposal-class-properties": "^7.3.3",
     "@babel/preset-env": "^7.3.1",
+    "@phtml/image-alt": "^1.0.0",
     "babel-eslint": "^10.0.1",
     "babel-plugin-async-to-promises": "^1.0.5",
     "babel-plugin-transform-for-of-as-array": "^1.1.1",
     "benchmark": "^2.1.4",
+    "cross-env": "^5.2.0",
     "docdash": "^1.0.2",
-    "eslint": "^5.13.0",
+    "eslint": "^5.14.1",
     "eslint-config-dev": "^2.0.0",
     "jsdoc": "^3.5.5",
     "pre-commit": "^1.2.2",
-    "rollup": "^1.1.2",
+    "rollup": "^1.2.2",
     "rollup-plugin-babel": "^4.3.2",
+    "rollup-plugin-commonjs": "^9.2.0",
+    "rollup-plugin-node-resolve": "^4.0.0",
     "rollup-plugin-terser": "^4.0.4"
   },
   "eslintConfig": {

@@ -16,7 +16,7 @@ async function tests() {
 	<p class="foo" bar-qux="lorem" />
 </section>`;
 
-	const fragment = await new Result(html, processOptions).root;
+	const fragment = (new Result(html, processOptions)).root;
 
 	/* Test Container
 	/* ====================================================================== */
@@ -76,7 +76,7 @@ async function tests() {
 	/* Test Comment
 	/* ====================================================================== */
 
-	const comment = (await new Result(`<!--test   -->`, processOptions).root).first;
+	const comment = (new Result(`<!--test   -->`, processOptions)).root.first;
 
 	await test('Comment', () => comment instanceof Comment);
 	await test('Comment#comment', () => comment.comment === 'test   ');
@@ -88,23 +88,23 @@ async function tests() {
 	/* Test Element
 	/* ====================================================================== */
 
-	const selfClosing = (await new Result(`<section ...{weird} />`, processOptions).root).first;
+	const selfClosing = (new Result(`<section ...{weird}   />`, processOptions).root).first;
 
 	await test('Element(selfClosing)#isSelfClosing', () => selfClosing.isSelfClosing === true);
 	await test('Element(selfClosing)#innerHTML', () => selfClosing.innerHTML === '');
-	await test('Element(selfClosing)#outerHTML', () => selfClosing.outerHTML === '<section ...{weird}/>');
+	await test('Element(selfClosing)#outerHTML', () => selfClosing.outerHTML === '<section ...{weird}   />');
 	await test('Element(selfClosing)#sourceInnerHTML', () => selfClosing.sourceInnerHTML === '');
-	await test('Element(selfClosing)#sourceOuterHTML', () => selfClosing.sourceOuterHTML === '<section ...{weird} />');
+	await test('Element(selfClosing)#sourceOuterHTML', () => selfClosing.sourceOuterHTML === '<section ...{weird}   />');
 
 	await test('Element(selfClosing)#isSelfClosing', () => selfClosing.isSelfClosing === true);
 
-	const duplicateAttributes1 = (await new Result('<section class class />', processOptions).root).first;
-	const duplicateAttributes2 = (await new Result('<section class="foo" class="bar" />', processOptions).root).first;
+	const duplicateAttributes1 = (new Result('<section class class />', processOptions).root).first;
+	const duplicateAttributes2 = (new Result('<section class="foo" class="bar" />', processOptions).root).first;
 
 	await test('Element(duplicateAttributes) contains duplicate attributes', () => duplicateAttributes1.attrs.length === 2 && duplicateAttributes1.attrs[0].value === duplicateAttributes1.attrs[1].value);
 	await test('Element(duplicateAttributes) contains duplicate attributes', () => duplicateAttributes2.attrs.length === 2 && duplicateAttributes2.attrs[0].value === 'foo' && duplicateAttributes2.attrs[1].value === 'bar');
 
-	const mutatedAttributes1 = (await new Result('<section class="foo" />', processOptions).root).first;
+	const mutatedAttributes1 = (new Result('<section class="foo" />', processOptions).root).first;
 	const mutatedAttributes1OriginalAttr = mutatedAttributes1.attrs[0];
 	const mutatedAttributes1OriginalAttrValue = mutatedAttributes1OriginalAttr.value;
 
@@ -121,7 +121,7 @@ async function tests() {
 
 	await test('Element(mutatedAttributes) toggled a specific attribute on', () => mutatedAttributes1.attrs.length === 2 && mutatedAttributes1.attrs.contains('id') === true);
 
-	const original = await new Result(`<p>Hello World</p>`, processOptions).root;
+	const original = (new Result(`<p>Hello World</p>`, processOptions)).root;
 	const clone = original.clone(true);
 
 	/* Test Container Clone
@@ -222,9 +222,65 @@ async function tests() {
 
 	const pHTML5 = new PHTML([ plugin5 ]);
 
-	const result = await pHTML5.process(html)
+	const result = await pHTML5.process(html);
 
 	await test('Plugin: Node#warn, Result: warnings', () => result.warnings.length === 2);
+
+	/* Test Plugin Object
+	/* ====================================================================== */
+
+	let remainingObservers6 = 13;
+
+	const plugin6 = {
+		beforeElement() {
+			--remainingObservers6;
+		},
+		PElement(element) {
+			--remainingObservers6;
+		},
+		Root() {
+			--remainingObservers6;
+		}
+	};
+
+	const pHTML6 = new PHTML([ plugin6 ]);
+
+	const result6 = await pHTML6.process(html);
+
+	await test('Plugin: Element with Observers', () => !remainingObservers6);
+
+	/* Test Plugin Object
+	/* ====================================================================== */
+
+	let remainingObservers7 = 13;
+
+	const plugin7a = {
+		beforeElement(node) {
+			--remainingObservers7;
+		},
+		PElement(element) {
+			--remainingObservers7;
+		},
+		Root() {
+			--remainingObservers7;
+		}
+	};
+
+	const plugin7b = async root => {
+		if (remainingObservers7) {
+			throw new Error('incorrect observer count');
+		} else {
+			remainingObservers7 = 13;
+		}
+
+		await root.observe();
+	};
+
+	const pHTML7 = new PHTML([ plugin7a, plugin7b ]);
+
+	const result7 = await pHTML7.process(html);
+
+	await test('Plugin: Element with Observers and Functions', () => !remainingObservers7);
 }
 
 tests();

@@ -1,4 +1,5 @@
 import Result from './Result';
+import observe from './observe'
 
 /**
 * @name Plugin
@@ -32,9 +33,9 @@ class Plugin extends Function {
 				configurable: true
 			},
 			pluginFunction: {
-				value: pluginFunction instanceof Function
-					? pluginFunction
-				: () => {},
+				value: typeof pluginFunction === 'function' ?
+					pluginFunction
+				: () => pluginFunction,
 				configurable: true
 			},
 			process: {
@@ -58,9 +59,13 @@ class Plugin extends Function {
 	async process (input, processOptions, pluginOptions) {
 		const result = new Result(input, processOptions);
 
-		result.root = await result.root;
+		const initializedPlugin = this.pluginFunction(pluginOptions);
 
-		await this.pluginFunction(pluginOptions)(result.root, result);
+		if (typeof initializedPlugin === 'function') {
+			await initializedPlugin(result.root, result);
+		} else {
+			await observe(result.root, result, initializedPlugin);
+		}
 
 		return result;
 	}
