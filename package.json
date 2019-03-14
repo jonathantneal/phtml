@@ -33,7 +33,7 @@
     "prepublishOnly": "npm test && npm run build",
     "pretest:tape": "npm run build:node",
     "test": "npm run test:js && npm run test:tape",
-    "test:js": "eslint *.mjs src/*.mjs --cache --ignore-path .gitignore --quiet",
+    "test:js": "eslint *.js src/*.js --cache --ignore-path .gitignore --quiet",
     "test:tape": "node --no-warnings --experimental-modules .tape"
   },
   "engines": {

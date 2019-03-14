@@ -8,7 +8,7 @@ const isBrowserDev = String(process.env.NODE_ENV).includes('browserdev');
 const isCli = String(process.env.NODE_ENV).includes('cli');
 
 const pathname = isCli ? 'cli/index' : 'index';
-const input = `src/${pathname}.mjs`;
+const input = `src/${pathname}.js`;
 const output = isBrowserDev
 	? { file: 'browser.development.js', format: 'cjs', sourcemap: true }
 : isBrowser
