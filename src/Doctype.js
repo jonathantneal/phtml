@@ -10,7 +10,7 @@ import Node from './Node';
 * @param {String} settings.publicId - Public identifier portion of the {@link Doctype}.
 * @param {String} settings.systemId - System identifier portion of the {@link Doctype}.
 * @param {Object} settings.source - Source mapping of the {@link Doctype}.
-* @return {Doctype}
+* @returns {Doctype}
 * @example
 * new Doctype({ name: 'html' }) // <!doctype html>
 */

@@ -1,9 +1,11 @@
+import visit from './visit';
+
 /**
 * @name Node
 * @class
 * @extends Node
 * @classdesc Create a new {@link Node}.
-* @return {Node}
+* @returns {Node}
 */
 class Node {
 	/**
@@ -198,18 +200,6 @@ class Node {
 	}
 
 	/**
-	* Observe the node and its descendants using the currently enabled plugins.
-	* @returns {Promise}
-	* @example
-	* // return a promise that resolved after nodes are observed
-	* // or throw an error if plugins are yet enabled
-	* node.observe()
-	*/
-	observe () {
-		throw new Error('Observe may not be used without plugins');
-	}
-
-	/**
 	* Replace the current {@link Node} with another Node or Nodes.
 	* @param {...Node} nodes - Any nodes replacing the current {@link Node}.
 	* @returns {Node} - The current {@link Node}
@@ -224,6 +214,19 @@ class Node {
 		}
 
 		return this;
+	}
+
+	/**
+	* Transform the node and its descendants using the current visitors.
+	* @returns {ResultPromise}
+	* @example
+	* await node.visit(result)
+	* await node.visit() // visit using the result of the current node
+	*/
+	visit (result) {
+		const resultToUse = 0 in arguments ? result : this.result;
+
+		return visit(this, resultToUse);
 	}
 
 	/**

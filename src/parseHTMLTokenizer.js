@@ -1,7 +1,7 @@
 import Tokenizer from 'parse5/lib/tokenizer';
 
 // patch _createDoctypeToken to support loose doctype nodes
-Tokenizer.prototype._createDoctypeToken = function _createDoctypeToken() {
+Tokenizer.prototype._createDoctypeToken = function _createDoctypeToken () {
 	const doctypeRegExp = /^(doctype)(\s+)(html)(?:(\s+)(public\s+(["']).*?\6))?(?:(\s+)((["']).*\9))?(\s*)/i;
 	const doctypeStartRegExp = /doctype\s*$/i;
 	const offset = this.preprocessor.html.slice(0, this.preprocessor.pos).match(doctypeStartRegExp, '')[0].length;
@@ -29,7 +29,7 @@ Tokenizer.prototype._createDoctypeToken = function _createDoctypeToken() {
 };
 
 // patch _createAttr to include the start offset position for name
-Tokenizer.prototype._createAttr = function _createAttr(attrNameFirstCh) {
+Tokenizer.prototype._createAttr = function _createAttr (attrNameFirstCh) {
 	this.currentAttr = {
 		name: attrNameFirstCh,
 		value: '',
@@ -38,7 +38,7 @@ Tokenizer.prototype._createAttr = function _createAttr(attrNameFirstCh) {
 };
 
 // patch _leaveAttrName to support duplicate attributes
-Tokenizer.prototype._leaveAttrName = function _leaveAttrName(toState) {
+Tokenizer.prototype._leaveAttrName = function _leaveAttrName (toState) {
 	const startName = this.currentAttr.startName;
 	const endName = this.currentAttr.endName = this.preprocessor.pos;
 
@@ -56,7 +56,7 @@ Tokenizer.prototype._leaveAttrName = function _leaveAttrName(toState) {
 };
 
 // patch _leaveAttrValue to include the offset end position for value
-Tokenizer.prototype._leaveAttrValue = function _leaveAttrValue(toState) {
+Tokenizer.prototype._leaveAttrValue = function _leaveAttrValue (toState) {
 	const startValue = this.currentAttr.endName + 1;
 	const endValue = this.preprocessor.pos;
 	const quote = endValue - this.currentAttr.value.length === startValue
@@ -74,7 +74,7 @@ Tokenizer.prototype._leaveAttrValue = function _leaveAttrValue(toState) {
 // patch TAG_OPEN_STATE to support jsx-style fragments
 const originalTAG_OPEN_STATE = Tokenizer.prototype.TAG_OPEN_STATE;
 
-Tokenizer.prototype.TAG_OPEN_STATE = function TAG_OPEN_STATE(cp) {
+Tokenizer.prototype.TAG_OPEN_STATE = function TAG_OPEN_STATE (cp) {
 	const isReactOpeningElement = this.preprocessor.html.slice(this.preprocessor.pos - 1, this.preprocessor.pos + 1) === '<>';
 	const isReactClosingElement = this.preprocessor.html.slice(this.preprocessor.pos - 1, this.preprocessor.pos + 2) === '</>';
 

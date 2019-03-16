@@ -1,6 +1,4 @@
-import Node from './Node';
 import Result from './Result';
-import observe, { getPluginsAndVisitors } from './observe'
 
 /**
 * @name Plugin
@@ -8,16 +6,16 @@ import observe, { getPluginsAndVisitors } from './observe'
 * @classdesc Create a new Plugin.
 * @param {String} name - Name of the Plugin.
 * @param {Function} pluginFunction - Function executed by the Plugin during initialization.
-* @return {Plugin}
+* @returns {Plugin}
 * @example
 * new Plugin('phtml-test', pluginOptions => {
 *   // initialization logic
 *
 *   return {
-*     Element(element, result) {
+*     Element (element, result) {
 *       // runtime logic, do something with an element
 *     },
-*     Root(root, result) {
+*     Root (root, result) {
 *       // runtime logic, do something with the root
 *     }
 *   }
@@ -53,7 +51,7 @@ class Plugin extends Function {
 				configurable: true
 			},
 			process: {
-				value(...args) {
+				value (...args) {
 					return Plugin.prototype.process.apply(this, args);
 				},
 				configurable: true
@@ -66,30 +64,15 @@ class Plugin extends Function {
 	* @param {String} input - Source being processed.
 	* @param {Object} processOptions - Custom settings applied to the Result.
 	* @param {Object} pluginOptions - Options passed to the Plugin.
-	* @return {Result}
+	* @returns {ResultPromise}
 	* @example
 	* plugin.process('some html', processOptions, pluginOptions)
 	*/
 	async process (input, processOptions, pluginOptions) {
-		const result = new Result(input, processOptions);
-
 		const initializedPlugin = this.pluginFunction(pluginOptions);
+		const result = new Result(input, { visitors: [ initializedPlugin ], ...Object(processOptions) });
 
-		const { visitors } = getPluginsAndVisitors([ initializedPlugin ]);
-
-		Object.assign(Node.prototype, {
-			async observe() {
-				return observe(this, result, visitors);
-			}
-		});
-
-		if (typeof initializedPlugin === 'function') {
-			await initializedPlugin(result.root, result);
-		} else {
-			await observe(result.root, result, initializedPlugin);
-		}
-
-		return result;
+		return result.visit(result.root);
 	}
 }
 

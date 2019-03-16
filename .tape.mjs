@@ -234,7 +234,7 @@ async function tests() {
 	let remainingObservers6 = 13;
 
 	const plugin6 = {
-		beforeElement() {
+		afterElement() {
 			--remainingObservers6;
 		},
 		PElement() {
@@ -257,7 +257,7 @@ async function tests() {
 	let remainingObservers7 = 13;
 
 	const plugin7a = {
-		beforeElement() {
+		afterElement() {
 			--remainingObservers7;
 		},
 		PElement() {
@@ -270,19 +270,19 @@ async function tests() {
 
 	const plugin7b = async root => {
 		if (remainingObservers7) {
-			throw new Error('incorrect observer count');
+			throw new Error('incorrect visitor count');
 		} else {
 			remainingObservers7 = 13;
 		}
 
-		await root.observe();
+		await root.visit();
 	};
 
 	const pHTML7 = new PHTML([ plugin7a, plugin7b ]);
 
 	await pHTML7.process(html);
 
-	await test('Plugin: Element with Observers and Functions', () => !remainingObservers7);
+	await test('Plugin: Element with Visitors and Functions', () => !remainingObservers7);
 }
 
 tests();

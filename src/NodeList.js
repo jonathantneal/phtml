@@ -15,7 +15,7 @@ const parents = new WeakMap();
 * @classdesc Create a new {@link NodeList}.
 * @param {Object} parent - Parent containing the current {@link NodeList}.
 * @param {...Node} nodes - {@link Node}s belonging to the current {@link NodeList}.
-* @return {NodeList}
+* @returns {NodeList}
 */
 class NodeList extends Array {
 	constructor (parent, ...nodes) {
@@ -129,7 +129,7 @@ class NodeList extends Array {
 	*/
 
 	static from (nodes) {
-		return new NodeList(getNodeListArray(nodes));
+		return new NodeList(new Fragment(), ...getNodeListArray(nodes));
 	}
 }
 
@@ -150,9 +150,12 @@ function getNodeListArray (nodes) {
 	};
 
 	// coerce nodes into an array
-	return [].concat(nodes || []).filter(
+	return Array.prototype.filter.call(
+		nodes === Object(nodes) ? nodes : [],
 		// nodes may be a string, an existing node, or a node-like object
-		node => node instanceof Node || typeof node === 'string' || node === Object(node) && node.type in nodeTypes
+		node => {
+			return node instanceof Node || typeof node === 'string' || node === Object(node) && node.type in nodeTypes;
+		}
 	).map(
 		node => node instanceof Node
 			// Nodes are unchanged

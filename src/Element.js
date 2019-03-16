@@ -16,7 +16,7 @@ import NodeList from './NodeList';
 * @param {Array|AttributeList|Object} settings.attrs - Attributes applied to the {@link Element}.
 * @param {Array|NodeList} settings.nodes - Nodes appended to the {@link Element}.
 * @param {Object} settings.source - Source mapping of the {@link Element}.
-* @return {Element} A new {@link Element} {@Link Node}
+* @returns {Element} A new {@link Element} {@Link Node}
 * @example
 * new Element({ name: 'p' }) // returns an element representing <p></p>
 *

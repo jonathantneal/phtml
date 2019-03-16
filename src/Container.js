@@ -5,7 +5,7 @@ import Node from './Node';
 * @class
 * @extends Node
 * @classdesc Return a new {@link Container} {@link Node}.
-* @return {Container}
+* @returns {Container}
 */
 class Container extends Node {
 	/**
@@ -64,7 +64,7 @@ class Container extends Node {
 	* @example
 	* container.innerHTML // returns a string of innerHTML
 	*/
-	get innerHTML() {
+	get innerHTML () {
 		return String(this.nodes);
 	}
 
@@ -74,7 +74,7 @@ class Container extends Node {
 	* @example
 	* container.outerHTML // returns a string of outerHTML
 	*/
-	get outerHTML() {
+	get outerHTML () {
 		return String(this);
 	}
 
@@ -176,13 +176,15 @@ class Container extends Node {
 
 function walk (node, cb, filter) {
 	if (typeof cb === 'function' && node.nodes) {
-		node.nodes.slice(0).filter(child => child.parent === node).forEach(child => {
-			if (testWithFilter(child, filter)) {
-				cb(child); // eslint-disable-line callback-return
-			}
+		node.nodes.slice(0).forEach(child => {
+			if (child.parent === node) {
+				if (testWithFilter(child, filter)) {
+					cb(child); // eslint-disable-line callback-return
+				}
 
-			if (child && child.nodes) {
-				walk(child, cb, filter);
+				if (child && child.nodes) {
+					walk(child, cb, filter);
+				}
 			}
 		});
 	}

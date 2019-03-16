@@ -12,10 +12,10 @@ function pass(name) {
 	process.stdout.write(`\x1b[32m${passSymbol}\x1b[0m phtml \x1b[2m${name}\x1b[0m\n`);
 }
 
-function fail(name) {
+function fail(name, error) {
 	process.stdout.clearLine();
 	process.stdout.cursorTo(0);
-	process.stdout.write(`\x1b[31m${failSymbol}\x1b[0m phtml \x1b[2m${name}\x1b[0m\n`);
+	process.stdout.write(`\x1b[31m${failSymbol}\x1b[0m phtml \x1b[2m${name}\x1b[0m\n${error ? `${error}\n` : ''}`);
 }
 
 export default async function test(name, fn) {
@@ -32,9 +32,7 @@ export default async function test(name, fn) {
 			process.exitCode = 1;
 		}
 	} catch (error) {
-		fail(name);
-
-		console.error(error);
+		fail(name, error);
 
 		process.exitCode = 1;
 	}

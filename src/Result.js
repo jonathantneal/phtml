@@ -5,6 +5,7 @@ import Doctype from './Doctype';
 import Element from './Element';
 import Fragment from './Fragment';
 import Text from './Text';
+import visit, { getVisitors } from './visit';
 
 /**
 * @name Result
@@ -14,7 +15,7 @@ import Text from './Text';
 * @param {String} processOptions.from - Source input location.
 * @param {String} processOptions.to - Destination output location.
 * @param {Array} processOptions.voidElements - Void elements.
-* @return {Result}
+* @returns {Result}
 * @property {Result} result - Result of pHTML transformations.
 * @property {String} result.from - Path to the HTML source file. You should always set from, because it is used in source map generation and syntax error messages.
 * @property {String} result.to - Path to the HTML output file.
@@ -34,6 +35,7 @@ class Result {
 		const voidElements = 'voidElements' in Object(processOptions)
 			? [].concat(Object(processOptions).voidElements || [])
 		: defaultVoidElements;
+		const visitors = getVisitors(Object(processOptions).visitors);
 
 		// prepare the result object
 		Object.assign(this, {
@@ -43,6 +45,7 @@ class Result {
 			input: { html, from, to },
 			root: null,
 			voidElements,
+			visitors,
 			messages: []
 		});
 
@@ -74,6 +77,20 @@ class Result {
 	*/
 	toJSON () {
 		return this.root.toJSON();
+	}
+
+	/**
+	* Transform the node and its descendants using the current visitors.
+	* @param {Node} [node] - the node to be visited.
+	* @returns {ResultPromise}
+	* @example
+	* await result.visit(someNode)
+	* await result.visit() // visit using the root of the current result
+	*/
+	visit (node) {
+		const nodeToUse = 0 in arguments ? node : this.root;
+
+		return visit(nodeToUse, this);
 	}
 
 	/**
@@ -127,9 +144,9 @@ function transform (node, result) {
 	}
 
 	const $node = treeAdapter.isCommentNode(node)
-		? new Comment({ comment: node.data, source })
+		? new Comment({ comment: node.data, source, result })
 	: treeAdapter.isDocumentTypeNode(node)
-		? new Doctype(Object.assign(node, { source: Object.assign({}, node.source, source) }))
+		? new Doctype(Object.assign(node, { result, source: Object.assign({}, node.source, source) }))
 	: treeAdapter.isElementNode(node)
 		? new Element({
 			name: result.input.html.slice(source.startOffset + 1, source.startOffset + 1 + node.nodeName.length),
@@ -138,12 +155,14 @@ function transform (node, result) {
 			isSelfClosing: /\//.test(source.before),
 			isWithoutEndTag: !Object(node.sourceCodeLocation).endTag,
 			isVoid: result.voidElements.includes(node.tagName),
+			result,
 			source
 		})
 	: treeAdapter.isTextNode(node)
-		? new Text({ data: node.value, source })
+		? new Text({ data: node.value, result, source })
 	: new Fragment({
 		nodes: node.childNodes instanceof Array ? node.childNodes.map(child => transform(child, result)) : null,
+		result,
 		source
 	});
 
@@ -170,3 +189,8 @@ const defaultVoidElements = [
 ];
 
 export default Result;
+
+/**
+* @typedef ResultPromise
+* @returns {Promise.<Result>} a new syntax tree {@link Result}
+*/

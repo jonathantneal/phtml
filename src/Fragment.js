@@ -6,7 +6,7 @@ import NodeList from './NodeList';
 * @class
 * @extends Container
 * @classdesc Create a new {@link Fragment} {@link Node}.
-* @return {Fragment}
+* @returns {Fragment}
 */
 class Fragment extends Container {
 	constructor (settings) {

@@ -4,7 +4,7 @@
 * @extends Array
 * @classdesc Return a new list of {@link Element} attributes.
 * @param {...Array|AttributeList|Object} attrs - An array or object of attributes.
-* @return {AttributeList}
+* @returns {AttributeList}
 * @example
 * new AttributeList({ name: 'class', value: 'foo' }, { name: 'id': value: 'bar' })
 */

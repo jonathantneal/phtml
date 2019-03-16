@@ -2,7 +2,7 @@ import HTMLParser from 'parse5/lib/parser';
 import treeAdapter from './parseHTMLTreeAdapter';
 import Tokenizer from './parseHTMLTokenizer';
 
-function parseLoose(html, parseOpts) {
+function parseLoose (html, parseOpts) {
 	this.tokenizer = new Tokenizer(this.options);
 	const document = treeAdapter.createDocumentFragment();
 	const template = treeAdapter.createDocumentFragment();
@@ -18,7 +18,7 @@ function parseLoose(html, parseOpts) {
 	return document;
 }
 
-export default function parseHTML(input, parseOpts) {
+export default function parseHTML (input, parseOpts) {
 	const htmlParser = new HTMLParser({
 		treeAdapter,
 		sourceCodeLocationInfo: true
@@ -28,7 +28,7 @@ export default function parseHTML(input, parseOpts) {
 }
 
 // filter out generated elements
-function filter(childNodes, parseOpts) {
+function filter (childNodes, parseOpts) {
 	return childNodes.reduce(
 		(nodes, childNode) => {
 			const isVoidElement = parseOpts.voidElements.includes(childNode.nodeName);

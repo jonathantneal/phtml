@@ -1,5 +1,12 @@
 # Changes to pHTML
 
+### 3.0.0 (March 15, 2019)
+
+- Changed: `Node.observe()` to `Node.visit()`
+- Changed: `Node` visitors occur before its children are visited, while `afterNode` visitors occur afterward
+- Fixed: Issue with walkers walking nodes that had been moved or removed
+- Fixed: Issue with `NodeList.from` not returning nodes
+
 ### 2.0.4 (March 11, 2019)
 
 - Fixed: Issue with Node observe for pHTML and Plugin process

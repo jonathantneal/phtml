@@ -8,7 +8,7 @@ import Node from './Node';
 * @param {Object} settings - Custom settings applied to the {@link Text}.
 * @param {String} settings.data - Content of the {@link Text}.
 * @param {Object} settings.source - Source mapping of the {@link Text}.
-* @return {Text}
+* @returns {Text}
 * @example
 * new Text({ data: 'Hello World' })
 */

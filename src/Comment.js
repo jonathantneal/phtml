@@ -8,7 +8,7 @@ import Node from './Node';
 * @param {Object} settings - Custom settings applied to the Comment.
 * @param {String} settings.comment - Content of the Comment.
 * @param {Object} settings.source - Source mapping of the Comment.
-* @return {Comment}
+* @returns {Comment}
 * @example
 * new Comment({ comment: ' Hello World ' })
 */

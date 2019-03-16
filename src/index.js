@@ -9,14 +9,13 @@ import NodeList from './NodeList';
 import Plugin from './Plugin';
 import Result from './Result';
 import Text from './Text';
-import observe, { getPluginsAndVisitors, runAll } from './observe';
 
 /**
 * @name PHTML
 * @class
 * @classdesc Create a new instance of {@link PHTML}.
 * @param {Array|Plugin|Function} plugins - Plugin or plugins being added.
-* @return {PHTML}
+* @returns {PHTML}
 * @example
 * new PHTML(plugin)
 * @example
@@ -33,43 +32,32 @@ class PHTML {
 	* Process input using plugins and return the result
 	* @param {String} input - Source being processed.
 	* @param {Object} processOptions - Custom settings applied to the Result.
-	* @return {Result}
+	* @returns {ResultPromise}
 	* @example
 	* phtml.process('some html', processOptions)
 	*/
-	async process (input, processOptions) {
-		const result = new Result(input, processOptions);
-		const { plugins, visitors } = getPluginsAndVisitors(this.plugins);
+	process (input, processOptions) {
+		const result = new Result(input, { visitors: this.plugins, ...Object(processOptions) });
 
-		Object.assign(Node.prototype, {
-			async observe() {
-				return observe(this, result, visitors);
-			}
-		});
-
-		// dispatch observers
-		await observe(result.root, result, visitors);
-
-		await runAll(plugins, result.root, result);
-
-		return result;
+		// dispatch visitors and promise the result
+		return result.visit();
 	}
 
 	/**
 	* Add plugins to the existing instance of PHTML
 	* @param {Array|Plugin|Function} plugins - Plugin or plugins being added.
-	* @return {PHTML}
+	* @returns {PHTML}
 	* @example
 	* phtml.use(plugin)
 	* @example
 	* phtml.use([ somePlugin, anotherPlugin ])
 	*/
 	use (pluginOrPlugins) {
-		const plugins = pluginOrPlugins instanceof Array
+		const plugins = Array.isArray(pluginOrPlugins)
 			? pluginOrPlugins.filter(
-				plugin => plugin instanceof Plugin || plugin instanceof Function || Object(plugin) === plugin && Object.keys(plugin).length
+				plugin => typeof plugin === 'function' || Object(plugin) === plugin && Object.keys(plugin).length
 			)
-		: pluginOrPlugins instanceof Plugin || pluginOrPlugins instanceof Function || Object(pluginOrPlugins) === pluginOrPlugins && Object.keys(pluginOrPlugins).length
+		: typeof pluginOrPlugins === 'function' || Object(pluginOrPlugins) === pluginOrPlugins && Object.keys(pluginOrPlugins).length
 			? [pluginOrPlugins]
 		: [];
 
@@ -82,7 +70,7 @@ class PHTML {
 	* Process input and return the new {@link Result}
 	* @param {Object} [processOptions] - Custom settings applied to the {@link Result}.
 	* @param {Array|Plugin|Function} [plugins] - Custom settings applied to the {@link Result}.
-	* @return {Result}
+	* @returns {ResultPromise}
 	* @example
 	* PHTML.process('some html', processOptions)
 	* @example <caption>Process HTML with plugins.</caption>
@@ -97,7 +85,7 @@ class PHTML {
 	/**
 	* Return a new {@link PHTML} instance which will use plugins
 	* @param {Object} pluginOrPlugins - Plugin or plugins being added.
-	* @return {PHTML} - New {@link PHTML} instance
+	* @returns {PHTML} - New {@link PHTML} instance
 	* @example
 	* PHTML.use(plugin) // returns a new PHTML instance
 	* @example
@@ -109,7 +97,6 @@ class PHTML {
 
 	static AttributeList = AttributeList;
 	static Comment = Comment;
-	static Container = Container;
 	static Container = Container;
 	static Doctype = Doctype;
 	static Element = Element;

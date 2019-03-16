@@ -4,7 +4,7 @@ import defaultTreeAdapter from 'parse5/lib/tree-adapters/default';
 defaultTreeAdapter.isElementNode = node => 'tagName' in node;
 
 // patch defaultTreeAdapter.createCommentNode to support doctype nodes
-defaultTreeAdapter.createCommentNode = function createCommentNode(data) {
+defaultTreeAdapter.createCommentNode = function createCommentNode (data) {
 	return typeof data === 'string' ? {
 		nodeName: '#comment',
 		data,
