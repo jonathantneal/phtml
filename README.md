@@ -16,7 +16,7 @@ or transform modern [CSS with PostCSS](https://github.com/phtmlorg/phtml-css)
 and [JS with Babel](https://github.com/phtmlorg/phtml-js).
 
 It works in the command line and Node, but also [Grunt], [Gulp],
-[<abbr title="Eleventy"></abbr>][11ty], [Webpack], [Rollup], and even
+[<abbr title="Eleventy">11ty</abbr>][11ty], [Webpack], [Rollup], and even
 [the browser itself][browser].
 
 ## Usage
