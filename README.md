@@ -49,7 +49,7 @@ Add [phtml] to your build tool:
 npm install phtml --save-dev
 ```
 
-Use [phtml] to process your CSS:
+Use [phtml] to process your HTML:
 
 ```js
 const phtml = require('phtml');
